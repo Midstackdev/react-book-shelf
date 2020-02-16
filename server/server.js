@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose')
+const cors = require('cors')
 const config = require('./config/config').get(process.env.NODE_ENV)
 const app = express()
 
@@ -14,6 +15,7 @@ const  { auth } = require('./middleware/auth')
 
 app.use(bodyParser.json())
 app.use(cookieParser())
+// app.use(cors())
 
 app.get('/api/auth', auth, (req, res) => {
     res.json({
