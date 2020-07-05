@@ -1,12 +1,13 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { addBook, clearNewBook } from '../../actions/book'
+import { getBook, updateBook, clearBook, deleteBook } from '../../actions/book'
 
-class AddBook extends Component {
+class EditBook extends PureComponent {
 
     state = {
         formdata: {
+            _id: this.props.match.params.id,
             name: '',
             author: '',
             review: '',
@@ -28,35 +29,71 @@ class AddBook extends Component {
         })
     }
 
-    showNewBook = (book) => (
-        book.post ? 
-            <div className="conf_link">
-                Cool! <Link to={`/books/${book.bookId}`}>
-                    click here to see books
-                </Link>
-            </div>
-            :null
-    )
-
     submitForm = (e) => {
         e.preventDefault()
-        this.props.dispatch(addBook({
-            ...this.state.formdata,
-            ownerId: this.props.user.login.id
-        }))
+        this.props.dispatch(updateBook(this.state.formdata))
         
+    }
+
+    deletePost = () => {
+        this.props.dispatch(deleteBook(this.props.match.params.id))
+    }
+
+    redirectUser = () => {
+        setTimeout(() => {
+            this.props.history.push(`/user/user-reviews`)
+        }, 1000 )
+    }
+
+    componentWillMount() {
+        this.props.dispatch(getBook(this.props.match.params.id))
+    }
+
+    componentWillReceiveProps(nextProps) {
+        // console.log(nextProps)
+        let book = nextProps.books.book
+        this.setState({
+            formdata: {
+                _id: book._id,
+                name: book.name,
+                author: book.author,
+                review: book.review,
+                pages: book.pages,
+                rating: book.rating,
+                price: book.price
+            }
+        })
     }
 
     componentWillUnmount() {
-        this.props.dispatch(clearNewBook())
+        this.props.dispatch(clearBook())
     }
 
+
     render() {
-        
+        let books = this.props.books
         return (
             <div className="rl_container article">
+                {
+                    books.updatebook ? 
+                    <div className="edit_confirm">
+                        post updates, <Link to={`/books/${books.book._id}`}>
+                            Click here to see your book
+                        </Link>
+                    </div> 
+                    
+                    : null
+                }
+                {
+                    books.postDeleted ? 
+                    <div className="red_tag">
+                        post deleted
+                        {this.redirectUser()}
+                    </div> 
+                    : null
+                }
                 <form onSubmit={this.submitForm}>  
-                    <h2>Add a Review</h2>
+                    <h2>Edit Review</h2>
 
                     <div className="form_element">
                         <input 
@@ -112,12 +149,15 @@ class AddBook extends Component {
                         />
                     </div>
 
-                    <button type="submit">Review</button>
-                    {
-                        this.props.books.newbook ?
-                            this.showNewBook(this.props.books.newbook)
-                        :null
-                    }
+                    <button type="submit">Edit Review</button>
+                    <div className="delete_post">
+                        <div className="button"
+                            onClick={this.deletePost}
+                        >
+                            Delete review
+                        </div>
+                    </div>
+                    
                 </form>
             </div>
         )
@@ -125,9 +165,10 @@ class AddBook extends Component {
 }
 
 function mapStateToProps(state) {
+    
     return{
         books: state.books
     }
 }
 
-export default connect(mapStateToProps) (AddBook)
+export default connect(mapStateToProps) (EditBook)

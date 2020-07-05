@@ -37,14 +37,14 @@ const SideNavItems = () => {
             type:'navItem',
             icon:'file-text-o',
             text:'My Reviews',
-            link:'/user/reviews',
+            link:'/user/user-reviews',
             restricted:false,
         },
         {
             type:'navItem',
             icon:'file-text-o',
             text:'Add Reviews',
-            link:'/user/add-reviews',
+            link:'/user/add',
             restricted:false,
         },
         {
