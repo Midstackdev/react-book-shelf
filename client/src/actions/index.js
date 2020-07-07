@@ -60,3 +60,33 @@ export function clearBooksWithReviewer () {
         }
     }
 }
+
+export function getUsers () {
+    const request = axios.get(`/api/users`)
+                    .then(response => response.data)
+
+    return {
+        type: 'GET_USERS',
+        payload: request
+    }
+}
+
+export function userRegister(user, userList) {
+    const request = axios.post(`/api/register`, user)
+    
+    return (dispatch) => {
+        request.then(({data}) => {
+            let users = data.success ? {users: [...userList, data.user]} : {users: [...userList]}
+            let response = {
+                success: data.success,
+                users
+            }
+            // console.log(response)
+
+            dispatch({
+                type: 'USER_REGISTER',
+                payload: response
+            })
+        })
+    }
+}
